@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Prueba del modelo de perros y gatos</title>
+<style>
+  @page { size: Letter; margin: 2.2cm 2.2cm 2cm 2.2cm; @bottom-right { content: counter(page); } }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #111; }
+  h1 { font-size: 26pt; margin: 0 0 2px 0; }
+  .sub { color: #777; font-size: 11pt; margin-bottom: 14px; }
+  h2 { font-size: 15pt; margin: 22px 0 6px 0; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 14px 0 4px 0; page-break-after: avoid; }
+  p { margin: 6px 0; }
+  table { border-collapse: collapse; margin: 8px 0 12px 0; font-size: 9.5pt; page-break-inside: avoid; }
+  th { background: #e9e9ee; text-align: left; font-weight: bold; padding: 6px 10px; border: 1px solid #d6d6dc; }
+  td { padding: 5px 10px; border: 1px solid #e1e1e6; }
+  td.n, th.n { text-align: right; }
+  figure { margin: 10px 0 14px 0; page-break-inside: avoid; }
+  figure img { width: 100%; }
+  figcaption { font-size: 9.5pt; margin-top: 4px; }
+  figcaption b { font-weight: bold; }
+  code, pre { font-family: "Courier New", monospace; font-size: 8.3pt; }
+  pre { white-space: pre-wrap; margin: 4px 0 10px 0; }
+  .small { font-size: 9pt; }
+  .pb { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<h1>Prueba del modelo de perros y gatos</h1>
+<div class="sub">Laboratorio — Clasificación de imágenes con redes neuronales convolucionales</div>
+
+<p>En este trabajo puse a prueba los modelos del cuaderno del profesor (<i>ImageClassification</i>). No cambié su código: lo copié en un cuaderno nuevo, volví a entrenar los 8 modelos y les medí las capas, las pérdidas y cuánto tardan en entrenar y en clasificar. Después guardé el modelo que el profesor eligió guardar (<i>modeloCNN_AD</i>), lo cargué de nuevo y lo usé para clasificar 100 fotos que no están en el dataset: 50 perros y 50 gatos. Al final medí qué tan bien acierta y cuántos recursos gasta.</p>
+
+<h2>1. Datos y equipo</h2>
+<p>Los modelos se entrenan con el dataset <i>cats_vs_dogs</i> de TensorFlow Datasets. Cada imagen trae su etiqueta: 0 es gato y 1 es perro. Las clases están casi parejas, así que acertar el 50 % equivale a adivinar.</p>
+<table>
+<tr><th>Característica</th><th>Valor</th></tr>
+<tr><td>Imágenes del dataset</td><td>23.262</td></tr>
+<tr><td>Perros / gatos</td><td>11.604 / 11.658</td></tr>
+<tr><td>Tamaño de entrada de los modelos</td><td>100 × 100 (color o escala de grises)</td></tr>
+<tr><td>Imágenes de prueba externas</td><td>100 (50 perros y 50 gatos, Wikimedia Commons)</td></tr>
+</table>
+<p>Ejecuté el cuaderno completo en mi computador, dentro de un contenedor Docker con la misma versión de TensorFlow que usa el Colab del profesor.</p>
+<table>
+<tr><th>Componente</th><th>Detalle</th></tr>
+<tr><td>TensorFlow</td><td>2.20.0 (imagen <code>tensorflow/tensorflow:2.20.0-gpu-jupyter</code>)</td></tr>
+<tr><td>GPU</td><td>NVIDIA GeForce RTX 4070 Laptop, 8 GB</td></tr>
+<tr><td>CPU</td><td>16 núcleos lógicos</td></tr>
+<tr><td>RAM disponible para el contenedor</td><td>11,5 GB</td></tr>
+</table>
+<p>Las 100 fotos externas las saqué de las categorías de imágenes de calidad de perros y gatos de Wikimedia Commons. Revisé una por una para dejar solo fotos reales con un perro o un gato como protagonista: sin dibujos, sin estatuas y sin los dos animales juntos. Las guardé en <code>imagenes_prueba/perros</code> y <code>imagenes_prueba/gatos</code>, y el autor y la licencia de cada una quedaron en <code>fuentes.csv</code>.</p>
+
+<h2>2. Los modelos y sus capas</h2>
+<p>El cuaderno tiene tres grupos de modelos. Los dos primeros reciben la imagen a color. Los otros tres la reciben en escala de grises. Los últimos tres son los mismos de escala de grises, pero se entrenan con aumento de datos: en cada época las imágenes se giran, se mueven, se inclinan, se acercan y se voltean al azar. Todos terminan en una neurona con activación <i>sigmoid</i>, que da un número entre 0 y 1: cerca de 0 es gato y cerca de 1 es perro.</p>
+<table>
+<tr><th>Modelo</th><th>Entrada</th><th>Capas</th><th class="n">Parámetros</th></tr>
+<tr><td>modelo_denso</td><td>Color</td><td>Flatten → Dense(128) → Dense(1)</td><td class="n">3.840.257</td></tr>
+<tr><td>modelo_cnn</td><td>Color</td><td>Conv(32) → Pool → Conv(64) → Pool → Flatten → Dense(128) → Dense(1)</td><td class="n">4.353.217</td></tr>
+<tr><td>modeloDenso</td><td>Gris</td><td>Flatten → Dense(150) → Dense(150) → Dense(1)</td><td class="n">1.522.951</td></tr>
+<tr><td>modeloCNN</td><td>Gris</td><td>Conv(32) → Pool → Conv(64) → Pool → Conv(128) → Pool → Flatten → Dense(100) → Dense(1)</td><td class="n">1.372.873</td></tr>
+<tr><td>modeloCNN2</td><td>Gris</td><td>Igual a modeloCNN + Dropout(0.5) antes de Flatten</td><td class="n">1.372.873</td></tr>
+<tr><td>modeloDenso_AD</td><td>Gris + aumento</td><td>Igual a modeloDenso</td><td class="n">1.522.951</td></tr>
+<tr><td>modeloCNN_AD</td><td>Gris + aumento</td><td>Igual a modeloCNN</td><td class="n">1.372.873</td></tr>
+<tr><td>modeloCNN2_AD</td><td>Gris + aumento</td><td>Igual a modeloCNN2, pero con Dense(250)</td><td class="n">3.293.173</td></tr>
+</table>
+<p>Qué hace cada capa, en pocas palabras:</p>
+<table>
+<tr><th>Capa</th><th>Qué hace</th></tr>
+<tr><td>Conv2D</td><td>Pasa filtros pequeños de 3 × 3 por la imagen para encontrar bordes, texturas y formas. Cada filtro produce un mapa nuevo.</td></tr>
+<tr><td>MaxPooling2D</td><td>Reduce el mapa a la mitad: de cada cuadro de 2 × 2 se queda con el valor más alto.</td></tr>
+<tr><td>Dropout</td><td>Mientras entrena, apaga al azar la mitad de los valores para que el modelo no memorice.</td></tr>
+<tr><td>Flatten</td><td>Convierte la imagen o los mapas en una sola fila larga de números.</td></tr>
+<tr><td>Dense</td><td>Conecta cada número de entrada con cada neurona. Es donde se toma la decisión final.</td></tr>
+</table>
+<p>Así va cambiando el tamaño de los datos dentro de <i>modeloCNN_AD</i>, el modelo que se guarda y se prueba:</p>
+<table>
+<tr><th>Capa</th><th>Forma de salida</th><th class="n">Parámetros</th></tr>
+<tr><td>Conv2D 32 filtros</td><td>98 × 98 × 32</td><td class="n">320</td></tr>
+<tr><td>MaxPooling2D</td><td>49 × 49 × 32</td><td class="n">0</td></tr>
+<tr><td>Conv2D 64 filtros</td><td>47 × 47 × 64</td><td class="n">18.496</td></tr>
+<tr><td>MaxPooling2D</td><td>23 × 23 × 64</td><td class="n">0</td></tr>
+<tr><td>Conv2D 128 filtros</td><td>21 × 21 × 128</td><td class="n">73.856</td></tr>
+<tr><td>MaxPooling2D</td><td>10 × 10 × 128</td><td class="n">0</td></tr>
+<tr><td>Flatten</td><td>12.800</td><td class="n">0</td></tr>
+<tr><td>Dense 100</td><td>100</td><td class="n">1.280.100</td></tr>
+<tr><td>Dense 1 (sigmoid)</td><td>1</td><td class="n">101</td></tr>
+<tr><td><b>Total</b></td><td></td><td class="n"><b>1.372.873</b></td></tr>
+</table>
+<p>Casi todos los parámetros (93 %) están en la capa Dense de 100 neuronas. En los modelos densos pasa lo mismo, pero más fuerte: <i>modelo_denso</i> conecta los 30.000 valores de la imagen a color con 128 neuronas, y solo ahí se van 3,8 millones de parámetros.</p>
+
+<h2>3. Entrenamiento: pérdidas y tiempos</h2>
+<p>Entrené cada modelo con la misma configuración del cuaderno: igual número de épocas, igual tamaño de lote y la misma forma de validar. La pérdida es <i>binary crossentropy</i>. Un modelo que no aprende nada y siempre responde 0,5 queda en 0,6931.</p>
+<table>
+<tr><th>Modelo</th><th class="n">Épocas</th><th class="n">Lote</th><th class="n">Pérdida inicial</th><th class="n">Pérdida final</th><th class="n">Exactitud entren.</th><th class="n">Exactitud val.</th><th class="n">Tiempo total</th><th class="n">s / época</th></tr>
+<tr><td>modelo_denso</td><td class="n">5</td><td class="n">32</td><td class="n">1,7061</td><td class="n">0,6453</td><td class="n">0,6272</td><td class="n">—</td><td class="n">37,0 s</td><td class="n">7,4</td></tr>
+<tr><td>modelo_cnn</td><td class="n">5</td><td class="n">32</td><td class="n">0,5736</td><td class="n">0,1761</td><td class="n">0,9304</td><td class="n">—</td><td class="n">54,0 s</td><td class="n">10,8</td></tr>
+<tr><td>modeloDenso</td><td class="n">10</td><td class="n">32</td><td class="n">0,6876</td><td class="n">0,6362</td><td class="n">0,6343</td><td class="n">0,6206</td><td class="n">62,9 s</td><td class="n">6,3</td></tr>
+<tr><td>modeloCNN</td><td class="n">20</td><td class="n">128</td><td class="n">0,6932</td><td class="n">0,6932</td><td class="n">0,5029</td><td class="n">0,4914</td><td class="n">112,0 s</td><td class="n">5,6</td></tr>
+<tr><td>modeloCNN2</td><td class="n">20</td><td class="n">128</td><td class="n">0,6933</td><td class="n">0,6931</td><td class="n">0,5029</td><td class="n">0,4914</td><td class="n">109,5 s</td><td class="n">5,5</td></tr>
+<tr><td>modeloDenso_AD</td><td class="n">50</td><td class="n">32</td><td class="n">0,6928</td><td class="n">0,6687</td><td class="n">0,5848</td><td class="n">0,6005</td><td class="n">824,9 s</td><td class="n">16,5</td></tr>
+<tr><td>modeloCNN_AD</td><td class="n">50</td><td class="n">32</td><td class="n">0,6932</td><td class="n">0,6932</td><td class="n">0,5028</td><td class="n">0,4921</td><td class="n">770,1 s</td><td class="n">15,4</td></tr>
+<tr><td>modeloCNN2_AD</td><td class="n">50</td><td class="n">32</td><td class="n">0,6933</td><td class="n">0,6932</td><td class="n">0,5014</td><td class="n">0,4921</td><td class="n">779,4 s</td><td class="n">15,6</td></tr>
+</table>
+<p class="small">Los dos modelos a color se entrenan sin validación, así que su exactitud es sobre las mismas imágenes con las que aprendieron. Los modelos en gris usan el 15 % final de los datos para validar, y los _AD usan las últimas 3.562 imágenes. El entrenamiento completo de los 8 modelos tardó unos 46 minutos.</p>
+
+<figure><img src="../resultados/curvas_perdida.png">
+<figcaption><b>Pérdida por época.</b> Solo bajan <i>modelo_denso</i>, <i>modelo_cnn</i>, <i>modeloDenso</i> y <i>modeloDenso_AD</i>. Las cuatro CNN en escala de grises se quedan en 0,6931–0,6934 de principio a fin: la escala del eje muestra que se mueven menos de 0,0003.</figcaption></figure>
+
+<figure><img src="../resultados/curvas_exactitud.png">
+<figcaption><b>Exactitud por época.</b> <i>modelo_cnn</i> llega al 93 % en entrenamiento. Las CNN en gris se quedan en 49–50 % en validación, que es lo mismo que adivinar.</figcaption></figure>
+
+<h2>4. Comparación de los modelos</h2>
+<p>También medí el tiempo de clasificación de cada modelo. Antes de medir hice 5 llamadas de calentamiento y luego promedié 50 repeticiones, con una imagen y con un lote de 32.</p>
+<table>
+<tr><th>Modelo</th><th class="n">Parámetros</th><th class="n">Pesos (MB)</th><th class="n">1 imagen (ms)</th><th class="n">32 imágenes (ms)</th><th class="n">ms por imagen en lote</th></tr>
+<tr><td>modelo_denso</td><td class="n">3.840.257</td><td class="n">14,65</td><td class="n">4,21</td><td class="n">4,61</td><td class="n">0,14</td></tr>
+<tr><td>modelo_cnn</td><td class="n">4.353.217</td><td class="n">16,61</td><td class="n">8,47</td><td class="n">7,57</td><td class="n">0,24</td></tr>
+<tr><td>modeloDenso</td><td class="n">1.522.951</td><td class="n">5,81</td><td class="n">8,76</td><td class="n">11,85</td><td class="n">0,37</td></tr>
+<tr><td>modeloCNN</td><td class="n">1.372.873</td><td class="n">5,24</td><td class="n">18,46</td><td class="n">16,47</td><td class="n">0,51</td></tr>
+<tr><td>modeloCNN2</td><td class="n">1.372.873</td><td class="n">5,24</td><td class="n">10,32</td><td class="n">10,88</td><td class="n">0,34</td></tr>
+<tr><td>modeloDenso_AD</td><td class="n">1.522.951</td><td class="n">5,81</td><td class="n">4,29</td><td class="n">4,09</td><td class="n">0,13</td></tr>
+<tr><td>modeloCNN_AD</td><td class="n">1.372.873</td><td class="n">5,24</td><td class="n">9,40</td><td class="n">9,49</td><td class="n">0,30</td></tr>
+<tr><td>modeloCNN2_AD</td><td class="n">3.293.173</td><td class="n">12,56</td><td class="n">9,48</td><td class="n">11,73</td><td class="n">0,37</td></tr>
+</table>
+<p>Clasificar una imagen o 32 tarda casi lo mismo, entre 4 y 18 ms. Con modelos tan pequeños el costo está en mandar el trabajo a la GPU, no en el cálculo. Por eso conviene clasificar por lotes: en un lote de 32, cada imagen sale en menos de medio milisegundo.</p>
+
+<figure><img src="../resultados/comparacion_modelos.png">
+<figcaption><b>Comparación de los 8 modelos.</b> Las barras en 0 del panel de validación son los modelos a color, que no tienen validación. Los modelos con aumento de datos tardan unas 7 veces más en entrenar (50 épocas contra 10–20) y no mejoran.</figcaption></figure>
+
+<h3>Por qué las CNN en escala de grises no aprenden</h3>
+<p>En la celda de preparación en escala de grises, el cuaderno vuelve a dividir entre 255 imágenes que ya estaban divididas entre 255 en un paso anterior. Medí el rango de los píxeles que reciben los modelos en gris: van de 0 a 0,0039, cuando deberían ir de 0 a 1. Con valores tan pequeños, la imagen casi no influye en la respuesta, así que las CNN terminan dando siempre el mismo número. Las redes densas en gris sí lograron un 60–62 %. La CNN a color, que recibe las imágenes bien escaladas, llegó al 93 % en entrenamiento. Siguiendo la indicación de la actividad, no corregí el código. Lo dejo anotado porque explica los resultados de la prueba.</p>
+
+<figure><img src="../resultados/lo_que_ve_el_modelo.png" style="width:85%">
+<figcaption><b>Lo que recibe el modelo.</b> A la izquierda, la foto original. En el centro, la imagen después de las dos preparaciones, con el contraste ajustado para que se vea. A la derecha, la misma imagen en su escala real de 0 a 1: queda completamente negra.</figcaption></figure>
+
+<h2>5. Guardado y carga del modelo</h2>
+<p>Guardé <i>modeloCNN_AD</i> en formato <code>.h5</code>, igual que la celda del profesor, y también en el formato nuevo <code>.keras</code>. No instalé <i>tensorflowjs</i> porque al instalarlo cambia la versión de TensorFlow y eso habría dañado las mediciones. Luego cargué el modelo desde el archivo y comparé sus respuestas con las del modelo original sobre las 3.562 imágenes de validación.</p>
+<table>
+<tr><th>Medida</th><th>.h5</th><th>.keras</th></tr>
+<tr><td>Tamaño del archivo</td><td>15,76 MB</td><td>15,75 MB</td></tr>
+<tr><td>Tiempo de carga</td><td>0,181 s</td><td>0,362 s</td></tr>
+<tr><td>¿Responde igual que el original?</td><td>Sí</td><td>Sí</td></tr>
+</table>
+<p>El archivo pesa 15,8 MB aunque los pesos del modelo ocupan 5,24 MB. Esto pasa porque el archivo también guarda el estado del optimizador Adam, que lleva dos valores extra por cada parámetro. Cargar el modelo sumó apenas 0,5 MB de RAM y 5,2 MB de memoria de GPU. El modelo cargado dio 0,4921 de exactitud y 0,6932 de pérdida en validación, igual que al terminar de entrenar.</p>
+
+<h2>6. Prueba con las 100 imágenes</h2>
+<p>Cada foto pasó por la misma preparación que tuvieron las imágenes de entrenamiento: primero se lleva a 100 × 100 y se divide entre 255, y después se pasa a escala de grises y se vuelve a dividir entre 255. Así la prueba es justa con el modelo tal como quedó.</p>
+<table>
+<tr><th>Métrica</th><th class="n">Gato</th><th class="n">Perro</th></tr>
+<tr><td>Precisión</td><td class="n">0,50</td><td class="n">0,00</td></tr>
+<tr><td>Sensibilidad (recall)</td><td class="n">1,00</td><td class="n">0,00</td></tr>
+<tr><td>F1</td><td class="n">0,67</td><td class="n">0,00</td></tr>
+<tr><td>Imágenes</td><td class="n">50</td><td class="n">50</td></tr>
+<tr><td><b>Exactitud total</b></td><td class="n" colspan="2"><b>0,50 (50 de 100)</b></td></tr>
+</table>
+<p>El modelo respondió "gato" en las 100 fotos. Además, a todas les dio exactamente la misma probabilidad de ser perro: 0,4983. Como queda justo debajo del umbral de 0,5, todas salen como gato. Acertó los 50 gatos porque siempre dice gato, no porque los reconozca. Falló los 50 perros.</p>
+
+<figure><img src="../resultados/matriz_100_imagenes.png">
+<figcaption><b>Matriz de confusión con las 100 fotos.</b> Toda la respuesta cae en la columna "gato": 50 gatos bien clasificados y 50 perros clasificados como gato.</figcaption></figure>
+
+<figure><img src="../resultados/cuadricula_100.png">
+<figcaption><b>Predicción de cada foto.</b> En verde los aciertos y en rojo los errores. Entre paréntesis está la probabilidad de perro, que es 0,498 en todas.</figcaption></figure>
+
+<h2>7. Recursos: memoria, procesamiento y latencias</h2>
+<p>Clasifiqué las 100 fotos de dos formas. La primera fue una por una, como lo haría una aplicación que recibe una foto a la vez. La segunda fue las 100 de una sola vez. Hice la prueba en GPU y repetí todo en CPU. Antes de medir hice 5 clasificaciones de calentamiento.</p>
+<table>
+<tr><th>Medida</th><th class="n">GPU</th><th class="n">CPU</th></tr>
+<tr><td>Preparar una foto (leer, redimensionar, pasar a gris)</td><td class="n">12,62 ms</td><td class="n">7,92 ms</td></tr>
+<tr><td>Modelo, una foto — promedio</td><td class="n">10,65 ms</td><td class="n">11,80 ms</td></tr>
+<tr><td>Modelo, una foto — mediana</td><td class="n">9,89 ms</td><td class="n">11,44 ms</td></tr>
+<tr><td>Modelo, una foto — percentil 95</td><td class="n">14,12 ms</td><td class="n">13,96 ms</td></tr>
+<tr><td>Modelo, una foto — máximo</td><td class="n">22,08 ms</td><td class="n">20,35 ms</td></tr>
+<tr><td>Total por foto (preparar + modelo)</td><td class="n">23,27 ms</td><td class="n">19,72 ms</td></tr>
+<tr><td>100 fotos una por una</td><td class="n">2,34 s (43 fotos/s)</td><td class="n">1,98 s (50 fotos/s)</td></tr>
+<tr><td>100 fotos en un solo lote</td><td class="n">134 ms (746 fotos/s)</td><td class="n">189 ms (530 fotos/s)</td></tr>
+<tr><td>Uso de CPU del proceso durante la prueba</td><td class="n">5,0 %</td><td class="n">7,9 %</td></tr>
+<tr><td>Memoria de GPU (pico)</td><td class="n">307 MB</td><td class="n">—</td></tr>
+</table>
+<p>Lo que muestran estos números:</p>
+<p><b>Latencia.</b> Una foto suelta tarda unos 20–23 ms en total, y casi la mitad de ese tiempo es preparar la imagen, no clasificarla. Con una sola foto la GPU no ayuda: la CPU resultó incluso un poco más rápida, porque enviar una imagen tan pequeña a la GPU cuesta más que el cálculo. La GPU sí gana cuando se le da trabajo grande: con el lote de 100 fue 1,4 veces más rápida que la CPU.</p>
+<p><b>Memoria.</b> El modelo es liviano. El archivo pesa 15,8 MB y cargarlo sumó apenas 0,5 MB de RAM y 5,2 MB de GPU. El proceso completo ocupaba unos 6,6–6,7 GB de RAM, pero casi todo eso son los datos de entrenamiento que el cuaderno guarda en memoria (las 23.262 imágenes, más de 900 MB por copia), no el modelo. El pico de 307 MB de GPU incluye todo lo que el proceso tenía cargado en la GPU en ese momento, también los otros 7 modelos.</p>
+<p><b>Procesamiento.</b> Clasificar las 100 fotos usó muy poco procesador: entre 5 y 8 % del proceso sobre 16 núcleos.</p>
+
+<figure><img src="../resultados/latencia_por_imagen.png" style="width:80%">
+<figcaption><b>Latencia del modelo por foto.</b> La mayoría de las fotos tardan entre 9 y 14 ms en GPU y en CPU. Los pocos casos lentos (20–22 ms) son pausas puntuales del sistema.</figcaption></figure>
+
+<p>La celda del profesor que compara CPU y GPU con matrices de 12.000 × 12.000 dio 16,19 s en CPU y 15,16 s en GPU, es decir, casi lo mismo. El tiempo de la GPU incluye su arranque y la copia del resultado (576 MB) de vuelta a la memoria normal, porque la celda no hace una llamada de calentamiento antes de medir. Por eso no refleja la velocidad real de la GPU.</p>
+
+<h2>8. Conclusiones</h2>
+<p>El modelo que guarda el cuaderno, <i>modeloCNN_AD</i>, se guarda y se carga sin problemas. Responde igual después de cargarlo, pesa 15,8 MB, carga en menos de medio segundo y clasifica una foto en unos 10 ms. Como pieza de software funciona y gasta pocos recursos.</p>
+<p>Como clasificador no sirve en su estado actual. Con las 100 fotos nuevas acertó el 50 %, lo mismo que lanzar una moneda, porque responde "gato" con la misma probabilidad (0,4983) para cualquier foto. Esto no viene de las fotos nuevas: en validación ya tenía 49 % y su pérdida nunca bajó de 0,6932. La causa está en la doble división entre 255. Las imágenes llegan a las CNN en escala de grises con valores entre 0 y 0,004, y con eso no logran aprender nada.</p>
+<p>Entre los 8 modelos, el que mejor aprendió fue <i>modelo_cnn</i>, la CNN a color, con 93 % en entrenamiento. Pero no tiene validación, así que no se sabe cuánto de eso es memoria. Entre los que sí tienen validación, el mejor fue <i>modeloDenso</i>, con 62 %. El aumento de datos multiplicó el tiempo de entrenamiento por 7 y no mejoró ningún modelo.</p>
+<p>En cuanto a recursos, con modelos de este tamaño conviene clasificar por lotes. Una foto suelta se demora lo mismo en CPU que en GPU, mientras que en lotes la GPU procesa unas 750 fotos por segundo.</p>
+
+<h2 class="pb">9. Código</h2>
+<p>El cuaderno completo es <code>Prueba_Modelo_Perros_Gatos.ipynb</code>, y la versión ya ejecutada con todas sus salidas es <code>Prueba_Modelo_Perros_Gatos_ejecutado.ipynb</code>. Las celdas copiadas del profesor están marcadas con [Profesor]. Aquí van las partes que agregué para medir.</p>
+
+<h3>Tiempo por época (no cambia el entrenamiento)</h3>
+<pre>class TiempoPorEpoca(tf.keras.callbacks.Callback):
+    def on_train_begin(self, logs=None):
+        self.tiempos = []
+    def on_epoch_begin(self, epoch, logs=None):
+        self._inicio = time.perf_counter()
+    def on_epoch_end(self, epoch, logs=None):
+        self.tiempos.append(time.perf_counter() - self._inicio)</pre>
+
+<h3>Guardado, carga y comprobación</h3>
+<pre>modeloCNN_AD.save('perros-gatos-cnn-ad.h5')
+modeloCNN_AD.save('modelos/perros-gatos-cnn-ad.keras')
+
+inicio = time.perf_counter()
+modelo_cargado = tf.keras.models.load_model('modelos/perros-gatos-cnn-ad.h5')
+tiempo_carga = time.perf_counter() - inicio
+
+pred_original = modeloCNN_AD.predict(X_validacion, verbose=0)
+pred_h5 = modelo_cargado.predict(X_validacion, verbose=0)
+print(np.allclose(pred_original, pred_h5, atol=1e-6))</pre>
+
+<h3>Preparación de cada foto (igual que en entrenamiento)</h3>
+<pre>def preparar(ruta):
+    imagen = tf.io.decode_jpeg(tf.io.read_file(ruta), channels=3)
+    imagen, _ = preprocess_paso1(imagen, 0)   # 100x100 y /255
+    imagen, _ = preprocess(imagen, 0)         # gris, 100x100 y /255
+    return imagen</pre>
+
+<h3>Medición de latencia y recursos</h3>
+<pre>for r in rutas:
+    a = time.perf_counter(); x = tf.expand_dims(preparar(r), 0); _ = x.numpy(); b = time.perf_counter()
+    p = float(modelo(x, training=False).numpy()[0, 0]); c = time.perf_counter()
+    t_prep.append((b - a) * 1000); t_modelo.append((c - b) * 1000)
+    ram_pico = max(ram_pico, PROCESO.memory_info().rss / 1024**2)
+
+gpu_pico = tf.config.experimental.get_memory_info('GPU:0')['peak'] / 1024**2
+cpu_proceso = PROCESO.cpu_percent(interval=None) / psutil.cpu_count()
+
+lote = tf.stack([preparar(r) for r in rutas])
+inicio = time.perf_counter(); modelo.predict(lote, verbose=0); t_lote = time.perf_counter() - inicio</pre>
+
+<h3>Métricas con las 100 fotos</h3>
+<pre>predicciones = (probabilidades >= 0.5).astype(int)
+print(accuracy_score(etiquetas, predicciones))
+print(classification_report(etiquetas, predicciones, target_names=['gato', 'perro']))
+ConfusionMatrixDisplay.from_predictions(etiquetas, predicciones, display_labels=['gato', 'perro'])</pre>
+
+<p class="small">Fuentes de las imágenes: Wikimedia Commons. El autor y la licencia de cada foto están en <code>imagenes_prueba/fuentes.csv</code>; la mayoría son CC BY-SA 4.0 o 3.0.</p>
+
+</body>
+</html>

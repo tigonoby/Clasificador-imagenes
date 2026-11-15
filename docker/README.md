@@ -1,0 +1,1 @@
+Ejecutar un cuaderno con GPU (Git Bash, desde la carpeta del proyecto): `bash docker/ejecutar_cuaderno.sh "ImageClassification (1).ipynb" "salida_ejecutada.ipynb"` (requiere la imagen `tf-lab:2.20`: `docker build -t tf-lab:2.20 docker/`).

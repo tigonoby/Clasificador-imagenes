@@ -1,0 +1,7 @@
+# Registros de TensorBoard (se regeneran al ejecutar el cuaderno)
+logs/
+logs-new/
+# Copia del modelo que guarda la celda del profesor; la misma está en modelos/
+/perros-gatos-cnn-ad.h5
+.ipynb_checkpoints/
+__pycache__/

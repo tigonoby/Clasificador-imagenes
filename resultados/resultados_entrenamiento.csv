@@ -1,0 +1,9 @@
+Modelo,Entrada,Parámetros,Tamaño (MB),Épocas,Lote,Validación,Pérdida inicial,Pérdida final,Exactitud final (entren.),Pérdida val. final,Exactitud val. final,Mejor exactitud val.,Tiempo total (s),Segundos por época,Clasificar 1 imagen (ms),Clasificar 32 imágenes (ms)
+modelo_denso,RGB 100x100x3,3840257,14.65,5,32,Sin validación,1.7061,0.6453,0.6272,,,,37.0,7.4,4.21,4.61
+modelo_cnn,RGB 100x100x3,4353217,16.61,5,32,Sin validación,0.5736,0.1761,0.9304,,,,54.0,10.81,8.47,7.57
+modeloDenso,Gris 100x100x1,1522951,5.81,10,32,validation_split=0.15,0.6876,0.6362,0.6343,0.6464,0.6206,0.6206,62.9,6.29,8.76,11.85
+modeloCNN,Gris 100x100x1,1372873,5.24,20,128,validation_split=0.15,0.6932,0.6932,0.5029,0.6932,0.4914,0.4914,112.0,5.6,18.46,16.47
+modeloCNN2,Gris 100x100x1,1372873,5.24,20,128,validation_split=0.15,0.6933,0.6931,0.5029,0.6933,0.4914,0.4914,109.5,5.47,10.32,10.88
+modeloDenso_AD,Gris 100x100x1 + aumento,1522951,5.81,50,32,19.700 / 3.562,0.6928,0.6687,0.5848,0.6609,0.6005,0.6061,824.9,16.5,4.29,4.09
+modeloCNN_AD,Gris 100x100x1 + aumento,1372873,5.24,50,32,19.700 / 3.562,0.6932,0.6932,0.5028,0.6932,0.4921,0.5079,770.1,15.4,9.4,9.49
+modeloCNN2_AD,Gris 100x100x1 + aumento,3293173,12.56,50,32,19.700 / 3.562,0.6933,0.6932,0.5014,0.6932,0.4921,0.5079,779.4,15.59,9.48,11.73

@@ -1,0 +1,57 @@
+Modelo,Capa,Tipo,Forma de salida,Parámetros
+modelo_denso,flatten,Flatten,"(None, 30000)",0
+modelo_denso,dense,Dense,"(None, 128)",3840128
+modelo_denso,dense_1,Dense,"(None, 1)",129
+modelo_cnn,conv2d,Conv2D,"(None, 98, 98, 32)",896
+modelo_cnn,max_pooling2d,MaxPooling2D,"(None, 49, 49, 32)",0
+modelo_cnn,conv2d_1,Conv2D,"(None, 47, 47, 64)",18496
+modelo_cnn,max_pooling2d_1,MaxPooling2D,"(None, 23, 23, 64)",0
+modelo_cnn,flatten,Flatten,"(None, 33856)",0
+modelo_cnn,dense,Dense,"(None, 128)",4333696
+modelo_cnn,dense_1,Dense,"(None, 1)",129
+modeloDenso,flatten_1,Flatten,"(None, 10000)",0
+modeloDenso,dense_2,Dense,"(None, 150)",1500150
+modeloDenso,dense_3,Dense,"(None, 150)",22650
+modeloDenso,dense_4,Dense,"(None, 1)",151
+modeloCNN,conv2d_2,Conv2D,"(None, 98, 98, 32)",320
+modeloCNN,max_pooling2d_2,MaxPooling2D,"(None, 49, 49, 32)",0
+modeloCNN,conv2d_3,Conv2D,"(None, 47, 47, 64)",18496
+modeloCNN,max_pooling2d_3,MaxPooling2D,"(None, 23, 23, 64)",0
+modeloCNN,conv2d_4,Conv2D,"(None, 21, 21, 128)",73856
+modeloCNN,max_pooling2d_4,MaxPooling2D,"(None, 10, 10, 128)",0
+modeloCNN,flatten_2,Flatten,"(None, 12800)",0
+modeloCNN,dense_5,Dense,"(None, 100)",1280100
+modeloCNN,dense_6,Dense,"(None, 1)",101
+modeloCNN2,conv2d_5,Conv2D,"(None, 98, 98, 32)",320
+modeloCNN2,max_pooling2d_5,MaxPooling2D,"(None, 49, 49, 32)",0
+modeloCNN2,conv2d_6,Conv2D,"(None, 47, 47, 64)",18496
+modeloCNN2,max_pooling2d_6,MaxPooling2D,"(None, 23, 23, 64)",0
+modeloCNN2,conv2d_7,Conv2D,"(None, 21, 21, 128)",73856
+modeloCNN2,max_pooling2d_7,MaxPooling2D,"(None, 10, 10, 128)",0
+modeloCNN2,dropout,Dropout,"(None, 10, 10, 128)",0
+modeloCNN2,flatten_3,Flatten,"(None, 12800)",0
+modeloCNN2,dense_7,Dense,"(None, 100)",1280100
+modeloCNN2,dense_8,Dense,"(None, 1)",101
+modeloDenso_AD,flatten_4,Flatten,"(None, 10000)",0
+modeloDenso_AD,dense_9,Dense,"(None, 150)",1500150
+modeloDenso_AD,dense_10,Dense,"(None, 150)",22650
+modeloDenso_AD,dense_11,Dense,"(None, 1)",151
+modeloCNN_AD,conv2d_8,Conv2D,"(None, 98, 98, 32)",320
+modeloCNN_AD,max_pooling2d_8,MaxPooling2D,"(None, 49, 49, 32)",0
+modeloCNN_AD,conv2d_9,Conv2D,"(None, 47, 47, 64)",18496
+modeloCNN_AD,max_pooling2d_9,MaxPooling2D,"(None, 23, 23, 64)",0
+modeloCNN_AD,conv2d_10,Conv2D,"(None, 21, 21, 128)",73856
+modeloCNN_AD,max_pooling2d_10,MaxPooling2D,"(None, 10, 10, 128)",0
+modeloCNN_AD,flatten_5,Flatten,"(None, 12800)",0
+modeloCNN_AD,dense_12,Dense,"(None, 100)",1280100
+modeloCNN_AD,dense_13,Dense,"(None, 1)",101
+modeloCNN2_AD,conv2d_11,Conv2D,"(None, 98, 98, 32)",320
+modeloCNN2_AD,max_pooling2d_11,MaxPooling2D,"(None, 49, 49, 32)",0
+modeloCNN2_AD,conv2d_12,Conv2D,"(None, 47, 47, 64)",18496
+modeloCNN2_AD,max_pooling2d_12,MaxPooling2D,"(None, 23, 23, 64)",0
+modeloCNN2_AD,conv2d_13,Conv2D,"(None, 21, 21, 128)",73856
+modeloCNN2_AD,max_pooling2d_13,MaxPooling2D,"(None, 10, 10, 128)",0
+modeloCNN2_AD,dropout_1,Dropout,"(None, 10, 10, 128)",0
+modeloCNN2_AD,flatten_6,Flatten,"(None, 12800)",0
+modeloCNN2_AD,dense_14,Dense,"(None, 250)",3200250
+modeloCNN2_AD,dense_15,Dense,"(None, 1)",251

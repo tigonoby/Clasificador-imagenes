@@ -1,0 +1,23 @@
+{
+  "carga_h5_s": 0.1809584080001514,
+  "ram_por_carga_mb": 0.4765625,
+  "gpu_por_carga_mb": 5.239501953125,
+  "carga_keras_s": 0.36233319799976016,
+  "val_loss_cargado": 0.6932072043418884,
+  "val_acc_cargado": 0.4921392500400543,
+  "cpu_matmul_s": 16.191255569458008,
+  "gpu_matmul_s": 15.155191659927368,
+  "x_min": 0.0,
+  "x_max": 0.00392117677256465,
+  "x_mean": 0.0017915272619575262,
+  "n_total": 23262,
+  "n_perros": 11604,
+  "n_gatos": 11658,
+  "tamano_h5_mb": 15.7562255859375,
+  "tamano_keras_mb": 15.754084587097168,
+  "parametros_modeloCNN_AD": 1372873,
+  "tensorflow": "2.20.0",
+  "gpu": "[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]",
+  "cpu_nucleos": 16,
+  "ram_total_gb": 11.527420043945312
+}

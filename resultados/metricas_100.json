@@ -1,0 +1,10 @@
+{
+  "exactitud": 0.5,
+  "precision_gato": 0.5,
+  "precision_perro": 0.0,
+  "sensibilidad_gato": 1.0,
+  "sensibilidad_perro": 0.0,
+  "f1_gato": 0.6666666666666666,
+  "f1_perro": 0.0,
+  "predichos_perro": 0
+}

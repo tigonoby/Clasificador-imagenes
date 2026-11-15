@@ -1,0 +1,17 @@
+,/GPU:0,/CPU:0
+prep_ms_promedio,12.624,7.92
+modelo_ms_promedio,10.649,11.799
+modelo_ms_mediana,9.894,11.437
+modelo_ms_p95,14.119,13.956
+modelo_ms_max,22.08,20.347
+total_ms_promedio,23.273,19.72
+total_ms_p95,31.35,23.234
+uno_a_uno_100_s,2.338,1.983
+imagenes_por_segundo_uno_a_uno,42.767,50.435
+lote100_ms,134.133,188.685
+imagenes_por_segundo_lote,745.531,529.985
+ram_inicio_mb,6700.117,6567.496
+ram_pico_mb,6700.191,6567.883
+gpu_pico_mb,306.668,
+cpu_proceso_pct,5.0,7.912
+cpu_sistema_pct,6.1,9.3
