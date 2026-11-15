@@ -28,7 +28,7 @@
 <body>
 
 <h1>Prueba del modelo de perros y gatos</h1>
-<div class="sub">Laboratorio — Clasificación de imágenes con redes neuronales convolucionales</div>
+<div class="sub">Laboratorio: Clasificación de imágenes con redes neuronales convolucionales</div>
 
 <p>En este trabajo puse a prueba los modelos del cuaderno del profesor (<i>ImageClassification</i>). No cambié su código: lo copié en un cuaderno nuevo, volví a entrenar los 8 modelos y les medí las capas, las pérdidas y cuánto tardan en entrenar y en clasificar. Después guardé el modelo que el profesor eligió guardar (<i>modeloCNN_AD</i>), lo cargué de nuevo y lo usé para clasificar 100 fotos que no están en el dataset: 50 perros y 50 gatos. Al final medí qué tan bien acierta y cuántos recursos gasta.</p>
 
@@ -93,8 +93,8 @@
 <p>Entrené cada modelo con la misma configuración del cuaderno: igual número de épocas, igual tamaño de lote y la misma forma de validar. La pérdida es <i>binary crossentropy</i>. Un modelo que no aprende nada y siempre responde 0,5 queda en 0,6931.</p>
 <table>
 <tr><th>Modelo</th><th class="n">Épocas</th><th class="n">Lote</th><th class="n">Pérdida inicial</th><th class="n">Pérdida final</th><th class="n">Exactitud entren.</th><th class="n">Exactitud val.</th><th class="n">Tiempo total</th><th class="n">s / época</th></tr>
-<tr><td>modelo_denso</td><td class="n">5</td><td class="n">32</td><td class="n">1,7061</td><td class="n">0,6453</td><td class="n">0,6272</td><td class="n">—</td><td class="n">37,0 s</td><td class="n">7,4</td></tr>
-<tr><td>modelo_cnn</td><td class="n">5</td><td class="n">32</td><td class="n">0,5736</td><td class="n">0,1761</td><td class="n">0,9304</td><td class="n">—</td><td class="n">54,0 s</td><td class="n">10,8</td></tr>
+<tr><td>modelo_denso</td><td class="n">5</td><td class="n">32</td><td class="n">1,7061</td><td class="n">0,6453</td><td class="n">0,6272</td><td class="n"></td><td class="n">37,0 s</td><td class="n">7,4</td></tr>
+<tr><td>modelo_cnn</td><td class="n">5</td><td class="n">32</td><td class="n">0,5736</td><td class="n">0,1761</td><td class="n">0,9304</td><td class="n"></td><td class="n">54,0 s</td><td class="n">10,8</td></tr>
 <tr><td>modeloDenso</td><td class="n">10</td><td class="n">32</td><td class="n">0,6876</td><td class="n">0,6362</td><td class="n">0,6343</td><td class="n">0,6206</td><td class="n">62,9 s</td><td class="n">6,3</td></tr>
 <tr><td>modeloCNN</td><td class="n">20</td><td class="n">128</td><td class="n">0,6932</td><td class="n">0,6932</td><td class="n">0,5029</td><td class="n">0,4914</td><td class="n">112,0 s</td><td class="n">5,6</td></tr>
 <tr><td>modeloCNN2</td><td class="n">20</td><td class="n">128</td><td class="n">0,6933</td><td class="n">0,6931</td><td class="n">0,5029</td><td class="n">0,4914</td><td class="n">109,5 s</td><td class="n">5,5</td></tr>
@@ -105,10 +105,10 @@
 <p class="small">Los dos modelos a color se entrenan sin validación, así que su exactitud es sobre las mismas imágenes con las que aprendieron. Los modelos en gris usan el 15 % final de los datos para validar, y los _AD usan las últimas 3.562 imágenes. El entrenamiento completo de los 8 modelos tardó unos 46 minutos.</p>
 
 <figure><img src="../resultados/curvas_perdida.png">
-<figcaption><b>Pérdida por época.</b> Solo bajan <i>modelo_denso</i>, <i>modelo_cnn</i>, <i>modeloDenso</i> y <i>modeloDenso_AD</i>. Las cuatro CNN en escala de grises se quedan en 0,6931–0,6934 de principio a fin: la escala del eje muestra que se mueven menos de 0,0003.</figcaption></figure>
+<figcaption><b>Pérdida por época.</b> Solo bajan <i>modelo_denso</i>, <i>modelo_cnn</i>, <i>modeloDenso</i> y <i>modeloDenso_AD</i>. Las cuatro CNN en escala de grises se quedan en 0,6931 y 0,6934 de principio a fin: la escala del eje muestra que se mueven menos de 0,0003.</figcaption></figure>
 
 <figure><img src="../resultados/curvas_exactitud.png">
-<figcaption><b>Exactitud por época.</b> <i>modelo_cnn</i> llega al 93 % en entrenamiento. Las CNN en gris se quedan en 49–50 % en validación, que es lo mismo que adivinar.</figcaption></figure>
+<figcaption><b>Exactitud por época.</b> <i>modelo_cnn</i> llega al 93 % en entrenamiento. Las CNN en gris se quedan en 49 y 50 % en validación, que es lo mismo que adivinar.</figcaption></figure>
 
 <h2>4. Comparación de los modelos</h2>
 <p>También medí el tiempo de clasificación de cada modelo. Antes de medir hice 5 llamadas de calentamiento y luego promedié 50 repeticiones, con una imagen y con un lote de 32.</p>
@@ -126,10 +126,10 @@
 <p>Clasificar una imagen o 32 tarda casi lo mismo, entre 4 y 18 ms. Con modelos tan pequeños el costo está en mandar el trabajo a la GPU, no en el cálculo. Por eso conviene clasificar por lotes: en un lote de 32, cada imagen sale en menos de medio milisegundo.</p>
 
 <figure><img src="../resultados/comparacion_modelos.png">
-<figcaption><b>Comparación de los 8 modelos.</b> Las barras en 0 del panel de validación son los modelos a color, que no tienen validación. Los modelos con aumento de datos tardan unas 7 veces más en entrenar (50 épocas contra 10–20) y no mejoran.</figcaption></figure>
+<figcaption><b>Comparación de los 8 modelos.</b> Las barras en 0 del panel de validación son los modelos a color, que no tienen validación. Los modelos con aumento de datos tardan unas 7 veces más en entrenar (50 épocas contra 10 o 20) y no mejoran.</figcaption></figure>
 
 <h3>Por qué las CNN en escala de grises no aprenden</h3>
-<p>En la celda de preparación en escala de grises, el cuaderno vuelve a dividir entre 255 imágenes que ya estaban divididas entre 255 en un paso anterior. Medí el rango de los píxeles que reciben los modelos en gris: van de 0 a 0,0039, cuando deberían ir de 0 a 1. Con valores tan pequeños, la imagen casi no influye en la respuesta, así que las CNN terminan dando siempre el mismo número. Las redes densas en gris sí lograron un 60–62 %. La CNN a color, que recibe las imágenes bien escaladas, llegó al 93 % en entrenamiento. Siguiendo la indicación de la actividad, no corregí el código. Lo dejo anotado porque explica los resultados de la prueba.</p>
+<p>En la celda de preparación en escala de grises, el cuaderno vuelve a dividir entre 255 imágenes que ya estaban divididas entre 255 en un paso anterior. Medí el rango de los píxeles que reciben los modelos en gris: van de 0 a 0,0039, cuando deberían ir de 0 a 1. Con valores tan pequeños, la imagen casi no influye en la respuesta, así que las CNN terminan dando siempre el mismo número. Las redes densas en gris sí lograron un 60 y 62 %. La CNN a color, que recibe las imágenes bien escaladas, llegó al 93 % en entrenamiento. Siguiendo la indicación de la actividad, no corregí el código. Lo dejo anotado porque explica los resultados de la prueba.</p>
 
 <figure><img src="../resultados/lo_que_ve_el_modelo.png" style="width:85%">
 <figcaption><b>Lo que recibe el modelo.</b> A la izquierda, la foto original. En el centro, la imagen después de las dos preparaciones, con el contraste ajustado para que se vea. A la derecha, la misma imagen en su escala real de 0 a 1: queda completamente negra.</figcaption></figure>
@@ -167,23 +167,23 @@
 <table>
 <tr><th>Medida</th><th class="n">GPU</th><th class="n">CPU</th></tr>
 <tr><td>Preparar una foto (leer, redimensionar, pasar a gris)</td><td class="n">12,62 ms</td><td class="n">7,92 ms</td></tr>
-<tr><td>Modelo, una foto — promedio</td><td class="n">10,65 ms</td><td class="n">11,80 ms</td></tr>
-<tr><td>Modelo, una foto — mediana</td><td class="n">9,89 ms</td><td class="n">11,44 ms</td></tr>
-<tr><td>Modelo, una foto — percentil 95</td><td class="n">14,12 ms</td><td class="n">13,96 ms</td></tr>
-<tr><td>Modelo, una foto — máximo</td><td class="n">22,08 ms</td><td class="n">20,35 ms</td></tr>
+<tr><td>Modelo, una foto: promedio</td><td class="n">10,65 ms</td><td class="n">11,80 ms</td></tr>
+<tr><td>Modelo, una foto: mediana</td><td class="n">9,89 ms</td><td class="n">11,44 ms</td></tr>
+<tr><td>Modelo, una foto: percentil 95</td><td class="n">14,12 ms</td><td class="n">13,96 ms</td></tr>
+<tr><td>Modelo, una foto: máximo</td><td class="n">22,08 ms</td><td class="n">20,35 ms</td></tr>
 <tr><td>Total por foto (preparar + modelo)</td><td class="n">23,27 ms</td><td class="n">19,72 ms</td></tr>
 <tr><td>100 fotos una por una</td><td class="n">2,34 s (43 fotos/s)</td><td class="n">1,98 s (50 fotos/s)</td></tr>
 <tr><td>100 fotos en un solo lote</td><td class="n">134 ms (746 fotos/s)</td><td class="n">189 ms (530 fotos/s)</td></tr>
 <tr><td>Uso de CPU del proceso durante la prueba</td><td class="n">5,0 %</td><td class="n">7,9 %</td></tr>
-<tr><td>Memoria de GPU (pico)</td><td class="n">307 MB</td><td class="n">—</td></tr>
+<tr><td>Memoria de GPU (pico)</td><td class="n">307 MB</td><td class="n"></td></tr>
 </table>
-<p>Lo que muestran estos números:</p>
-<p><b>Latencia.</b> Una foto suelta tarda unos 20–23 ms en total, y casi la mitad de ese tiempo es preparar la imagen, no clasificarla. Con una sola foto la GPU no ayuda: la CPU resultó incluso un poco más rápida, porque enviar una imagen tan pequeña a la GPU cuesta más que el cálculo. La GPU sí gana cuando se le da trabajo grande: con el lote de 100 fue 1,4 veces más rápida que la CPU.</p>
-<p><b>Memoria.</b> El modelo es liviano. El archivo pesa 15,8 MB y cargarlo sumó apenas 0,5 MB de RAM y 5,2 MB de GPU. El proceso completo ocupaba unos 6,6–6,7 GB de RAM, pero casi todo eso son los datos de entrenamiento que el cuaderno guarda en memoria (las 23.262 imágenes, más de 900 MB por copia), no el modelo. El pico de 307 MB de GPU incluye todo lo que el proceso tenía cargado en la GPU en ese momento, también los otros 7 modelos.</p>
-<p><b>Procesamiento.</b> Clasificar las 100 fotos usó muy poco procesador: entre 5 y 8 % del proceso sobre 16 núcleos.</p>
+
+<p>Una foto suelta tarda unos 20 y 23 ms en total, y casi la mitad de ese tiempo es preparar la imagen, no clasificarla. Con una sola foto la GPU no ayuda: la CPU resultó incluso un poco más rápida, porque enviar una imagen tan pequeña a la GPU cuesta más que el cálculo. La GPU sí gana cuando se le da trabajo grande: con el lote de 100 fue 1,4 veces más rápida que la CPU.</p>
+<p>El modelo es liviano. El archivo pesa 15,8 MB y cargarlo sumó apenas 0,5 MB de RAM y 5,2 MB de GPU. El proceso completo ocupaba unos 6,6 y 6,7 GB de RAM, pero casi todo eso son los datos de entrenamiento que el cuaderno guarda en memoria (las 23.262 imágenes, más de 900 MB por copia), no el modelo. El pico de 307 MB de GPU incluye todo lo que el proceso tenía cargado en la GPU en ese momento, también los otros 7 modelos.</p>
+<p>Clasificar las 100 fotos usó muy poco procesador: entre 5 y 8 % del proceso sobre 16 núcleos.</p>
 
 <figure><img src="../resultados/latencia_por_imagen.png" style="width:80%">
-<figcaption><b>Latencia del modelo por foto.</b> La mayoría de las fotos tardan entre 9 y 14 ms en GPU y en CPU. Los pocos casos lentos (20–22 ms) son pausas puntuales del sistema.</figcaption></figure>
+<figcaption><b>Latencia del modelo por foto.</b> La mayoría de las fotos tardan entre 9 y 14 ms en GPU y en CPU. Los pocos casos lentos (20 a 22 ms) son pausas puntuales del sistema.</figcaption></figure>
 
 <p>La celda del profesor que compara CPU y GPU con matrices de 12.000 × 12.000 dio 16,19 s en CPU y 15,16 s en GPU, es decir, casi lo mismo. El tiempo de la GPU incluye su arranque y la copia del resultado (576 MB) de vuelta a la memoria normal, porque la celda no hace una llamada de calentamiento antes de medir. Por eso no refleja la velocidad real de la GPU.</p>
 

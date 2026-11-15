@@ -1,0 +1,4 @@
+# Para la imagen de producción solo se necesitan produccion/ y el modelo .keras
+*
+!produccion/
+!modelos/perros-gatos-cnn-ad.keras
